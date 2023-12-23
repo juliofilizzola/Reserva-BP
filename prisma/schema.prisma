@@ -9,3 +9,46 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Auth {
+  id        String    @id @default(uuid())
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model User {
+  id        String       @id @default(uuid())
+  type      TypeRole     @default(client)
+  document  String
+  name      String
+  phone     String?
+  client    Scheduling[] @relation("client")
+  brokers   Scheduling[] @relation("brokers")
+  email     String       @unique
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  deletedAt DateTime?
+}
+
+model Scheduling {
+  id          String    @id @default(uuid())
+  title       String
+  date        DateTime
+  wacth       DateTime
+  description String?
+  client      User      @relation("client", references: [id], fields: [clientId], onDelete: Cascade)
+  clientId    String
+  broker      User      @relation("brokers", references: [id], fields: [brokerId], onDelete: Cascade)
+  brokerId    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+}
+
+enum TypeRole {
+  admin
+  client
+  brokers
+}
