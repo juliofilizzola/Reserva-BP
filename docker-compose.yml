@@ -17,6 +17,7 @@ services:
 
   postgres_db:
     image: postgres:9-alpine
+    restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
