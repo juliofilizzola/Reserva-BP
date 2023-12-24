@@ -26,10 +26,7 @@ export class UserController {
 
   @Get('all')
   @Roles([TypeRoles.admin, TypeRoles.brokers])
-  findAll(
-    @Req() request: UserAuth,
-    @Query() { page, limit }: PaginationParams,
-  ) {
+  findAll(@Query() { page, limit }: PaginationParams) {
     const pagination: PaginationParams =
       page && limit ? { page: Number(page), limit: Number(limit) } : undefined;
     return this.userService.findAll(pagination);
