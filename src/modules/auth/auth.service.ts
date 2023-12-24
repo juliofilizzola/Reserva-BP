@@ -1,10 +1,10 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { validDocument } from '../../utils/validation/valid-document';
@@ -13,6 +13,7 @@ import { TypeRole, User } from '@prisma/client';
 import { UserToken } from '../../model/UserToken.model';
 import { UserAuthenticationPayloadModel } from '../../model/UserAuthenticationPayload.model';
 import { JwtService } from '@nestjs/jwt';
+import { UpdatePasswordDto } from './dto/update-passwword.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,7 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
   ) {}
-  create(createAuthDto: CreateAuthDto) {
+  async create(createAuthDto: CreateAuthDto, typeUser: TypeRole) {
     const validDoc = validDocument(createAuthDto.document);
 
     if (!validDoc) {
@@ -32,7 +33,7 @@ export class AuthService {
     return this.prismaService.user.create({
       data: {
         email: createAuthDto.email,
-        type: TypeRole.client,
+        type: typeUser,
         document: formatDocument(createAuthDto.document),
         phone: createAuthDto.phone,
         name: createAuthDto.name,
@@ -85,19 +86,43 @@ export class AuthService {
     });
   }
 
-  findAll() {
-    return 'This action returns all auth';
-  }
+  async updatedPassword(id: string, data: UpdatePasswordDto) {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        id,
+      },
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+    if (!user) {
+      throw new NotFoundException({
+        message: 'user not found',
+      });
+    }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+    const validOldPassWord = await this.validateUser(
+      user.email,
+      data.oldPassword,
+    );
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    if (!validOldPassWord) {
+      throw new BadRequestException({
+        message: 'password invalid!',
+      });
+    }
+
+    const hashSyncPassword = bcrypt.hashSync(data.newPassword, 10);
+
+    await this.prismaService.auth.update({
+      where: {
+        userId: id,
+      },
+      data: {
+        password: hashSyncPassword,
+      },
+    });
+
+    return {
+      result: 'register new password sucess!',
+    };
   }
 }

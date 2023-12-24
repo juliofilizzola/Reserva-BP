@@ -1,22 +1,24 @@
 import {
   Body,
   Controller,
-  Delete,
-  Get,
   HttpCode,
   HttpStatus,
-  Param,
   Patch,
   Post,
+  Req,
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { TypeRole } from '@prisma/client';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { IsPublic } from '../../decorators/is-public.decorator';
 import { AuthRequest } from '../../model/AuthRequest.model';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { Roles } from '../../decorators/roles.decorator';
+import { TypeRoles } from '../../roles/role';
+import { UserAuth } from '../../model/userAuth';
+import { UpdatePasswordDto } from './dto/update-passwword.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -25,7 +27,7 @@ export class AuthController {
   @Post('create')
   @IsPublic()
   create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+    return this.authService.create(createAuthDto, TypeRole.client);
   }
   @IsPublic()
   @UseGuards(LocalAuthGuard)
@@ -34,23 +36,21 @@ export class AuthController {
   login(@Request() req: AuthRequest) {
     return this.authService.login(req.user);
   }
-  @Get()
-  findAll() {
-    return this.authService.findAll();
+
+  @Post('createBrokers')
+  @Roles([TypeRoles.admin])
+  createBrokers(@Body() createAuthDto: CreateAuthDto) {
+    return this.authService.create(createAuthDto, TypeRole.brokers);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @Patch('/update-password')
+  updatePassword(
+    @Body() updatePasswordDto: UpdatePasswordDto,
+    @Req() request: UserAuth,
+  ) {
+    return this.authService.updatedPassword(
+      request.user.sub,
+      updatePasswordDto,
+    );
   }
 }
