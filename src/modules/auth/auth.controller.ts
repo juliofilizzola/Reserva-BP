@@ -37,7 +37,7 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
-  @Post('createBrokers')
+  @Post('create-brokers')
   @Roles([TypeRoles.admin])
   createBrokers(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.create(createAuthDto, TypeRole.brokers);
