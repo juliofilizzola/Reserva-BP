@@ -122,7 +122,7 @@ export class AuthService {
     });
 
     return {
-      result: 'register new password sucess!',
+      result: 'register new password success!',
     };
   }
 }
