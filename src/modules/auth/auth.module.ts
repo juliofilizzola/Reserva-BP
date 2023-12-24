@@ -23,7 +23,9 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoginValidationMiddleware).forRoutes('login');
-    consumer.apply(UserAlreadyExistsMiddlewares).forRoutes('create');
+    consumer.apply(LoginValidationMiddleware).forRoutes('auth/login');
+    consumer
+      .apply(UserAlreadyExistsMiddlewares)
+      .forRoutes('auth/create', 'auth/create-brokers');
   }
 }
