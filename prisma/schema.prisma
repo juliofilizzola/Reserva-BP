@@ -16,11 +16,14 @@ model Auth {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+  user      User      @relation(references: [id], fields: [userId], onDelete: Cascade)
+  userId    String    @unique
 }
 
 model User {
   id        String       @id @default(uuid())
   type      TypeRole     @default(client)
+  auth      Auth?
   document  String
   name      String
   phone     String?
