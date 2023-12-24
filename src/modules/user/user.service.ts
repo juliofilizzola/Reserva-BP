@@ -36,7 +36,14 @@ export class UserService {
       const { page, limit } = pagination;
       const response = await this.prismaService.$transaction([
         this.prismaService.user.count({}),
-        this.prismaService.user.findMany({}),
+        this.prismaService.user.findMany({
+          where: {},
+          skip: (page - 1) * limit,
+          take: limit,
+          orderBy: {
+            createdAt: 'desc',
+          },
+        }),
       ]);
 
       return paginateResponse<User>({

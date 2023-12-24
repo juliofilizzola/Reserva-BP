@@ -76,9 +76,12 @@ export class AuthService {
         user.auth.password,
       );
       delete user.auth;
-      if (isPasswordValid) {
-        return user;
+      if (!isPasswordValid) {
+        throw new UnauthorizedException({
+          message: 'Email address or password provided is incorrect.',
+        });
       }
+      return user;
     }
 
     throw new UnauthorizedException({

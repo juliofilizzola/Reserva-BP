@@ -33,13 +33,18 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('/:id') id: string) {
+  @Roles([TypeRoles.admin, TypeRoles.brokers])
+  findOne(@Param(':id') id: string) {
     return this.userService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param() id: string, @Body() updateUser: UpdateUserDto) {
+  @Patch('admin/:id')
+  updateAdmin(@Param() id: string, @Body() updateUser: UpdateUserDto) {
     return this.userService.update(id, updateUser);
+  }
+  @Patch()
+  update(@Req() req: UserAuth, @Body() updateUser: UpdateUserDto) {
+    return this.userService.update(req.user.sub, updateUser);
   }
 
   @Delete()
