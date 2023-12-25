@@ -39,6 +39,7 @@ export class UserController {
   }
 
   @Patch('admin/:id')
+  @Roles([TypeRoles.admin])
   updateAdmin(@Param() id: string, @Body() updateUser: UpdateUserDto) {
     return this.userService.update(id, updateUser);
   }
