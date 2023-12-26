@@ -31,7 +31,7 @@ export class UserService {
     return user;
   }
 
-  async findAll(pagination: PaginationParams) {
+  async findAll(pagination?: PaginationParams) {
     if (pagination) {
       const { page, limit } = pagination;
       const response = await this.prismaService.$transaction([
