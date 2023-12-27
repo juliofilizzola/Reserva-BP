@@ -39,7 +39,6 @@ model Reserve {
   id          String    @id @default(uuid())
   title       String
   date        DateTime
-  appointment DateTime
   duration    Int
   description String?
   client      User      @relation("client", references: [id], fields: [clientId], onDelete: Cascade)
