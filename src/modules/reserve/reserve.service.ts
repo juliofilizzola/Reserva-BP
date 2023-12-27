@@ -11,12 +11,6 @@ import { Prisma, Reserve, TypeRole } from '@prisma/client';
 import { paginateResponse } from '../../utils/paginations/pagination';
 import { PaginationParams } from '../../utils/paginations/type';
 
-interface IValidationBroker {
-  idBroker: string;
-  duration: number;
-  appointment: Date;
-  date: Date;
-}
 @Injectable()
 export class ReserveService {
   constructor(private readonly prismaService: PrismaService) {}
@@ -34,16 +28,15 @@ export class ReserveService {
       });
     }
 
-    const validation = this.validationBroker({
-      appointment: createReserveDto.appointment,
+    const validation = await this.validateReservation({
       date: createReserveDto.date,
       duration: createReserveDto.duration,
       idBroker: createReserveDto.idBroker,
     });
 
-    if (!validation) {
+    if (!validation.valid) {
       throw new BadRequestException({
-        message: 'Reservation with this duration is not available',
+        message: validation.message,
       });
     }
 
@@ -59,7 +52,6 @@ export class ReserveService {
             id: user.id,
           },
         },
-        appointment: createReserveDto.appointment,
         date: createReserveDto.date,
         duration: createReserveDto.duration,
         description: createReserveDto.description,
@@ -124,7 +116,6 @@ export class ReserveService {
     }
 
     let reserveUpdateInput: Prisma.ReserveUpdateInput = {
-      appointment: updateReserveDto?.appointment || reserve.appointment,
       date: updateReserveDto?.date || reserve.date,
       duration: updateReserveDto?.duration || reserve.duration,
       description: updateReserveDto?.description || reserve.description,
@@ -132,16 +123,15 @@ export class ReserveService {
     };
 
     if (updateReserveDto?.idBroker) {
-      const validation = this.validationBroker({
-        appointment: updateReserveDto?.appointment || reserve.appointment,
+      const validation = await this.validateReservation({
         date: updateReserveDto?.date || reserve.date,
         duration: updateReserveDto?.duration || reserve.duration,
         idBroker: updateReserveDto?.idBroker || reserve.brokerId,
       });
 
-      if (!validation) {
+      if (validation.valid) {
         throw new BadRequestException({
-          message: 'Reservation with this duration is not available',
+          message: validation.message,
         });
       }
 
@@ -183,46 +173,70 @@ export class ReserveService {
     });
   }
 
-  private async validationBroker(data: IValidationBroker): Promise<boolean> {
+  private async validateReservation(
+    data: IValidationReserve,
+  ): Promise<IResponseValidationReserve> {
+    const currentDate = new Date();
+
+    if (data.date < currentDate) {
+      return {
+        valid: false,
+        message: 'The selected date has already passed.',
+      };
+    }
+
     const broker = await this.prismaService.user.findFirst({
       where: {
         id: data.idBroker,
+        type: TypeRole.brokers,
       },
     });
 
-    if (!broker || broker.type !== TypeRole.brokers) {
-      throw new NotFoundException({
-        message: 'Broker not found',
-      });
+    if (!broker) {
+      return {
+        valid: false,
+        message: 'Broker not found.',
+      };
     }
 
     if (data.duration > 120 || data.duration < 30) {
-      throw new BadRequestException({
+      return {
+        valid: false,
         message:
-          'Invalid duration: Max duration 120 minutes, Min duration 30 minutes',
-      });
+          'Invalid duration: Duration must be between 30 and 120 minutes.',
+      };
     }
 
-    const durationReserve = addMinutes(data.appointment, data.duration);
+    const endReservationTime = addMinutes(data.date, data.duration);
 
     const overlappingReservations = await this.prismaService.reserve.findMany({
       where: {
         broker: {
           id: broker.id,
         },
-        AND: {
-          date: data.date,
-          appointment: {
-            gte: data.appointment,
-            lte: durationReserve,
-          },
+        date: {
+          gte: currentDate,
         },
       },
     });
 
-    const validDuration = overlappingReservations.filter(
-      (value) => durationReserve > value.appointment,
-    );
-    return !!validDuration.length;
+    const isDurationAvailable = overlappingReservations.some((reservation) => {
+      const reservationDurationOverlapping = addMinutes(
+        reservation.date,
+        reservation.duration,
+      );
+      return (
+        (endReservationTime > reservation.date &&
+          endReservationTime < reservationDurationOverlapping) ||
+        reservation.date === data.date
+      );
+    });
+
+    return {
+      valid: !isDurationAvailable,
+      message: isDurationAvailable
+        ? 'Reservation with this duration is not available.'
+        : null,
+    };
   }
 }
