@@ -21,25 +21,25 @@ model Auth {
 }
 
 model User {
-  id        String       @id @default(uuid())
-  type      TypeRole     @default(client)
+  id        String    @id @default(uuid())
+  type      TypeRole  @default(client)
   auth      Auth?
   document  String
   name      String
   phone     String?
-  client    Scheduling[] @relation("client")
-  brokers   Scheduling[] @relation("brokers")
-  email     String       @unique
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  client    Reserve[] @relation("client")
+  brokers   Reserve[] @relation("brokers")
+  email     String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 }
 
-model Scheduling {
+model Reserve {
   id          String    @id @default(uuid())
   title       String
   date        DateTime
-  wacth       DateTime
+  duration    Int
   description String?
   client      User      @relation("client", references: [id], fields: [clientId], onDelete: Cascade)
   clientId    String
