@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginRequest {
   @IsEmail(undefined, {
@@ -7,6 +8,12 @@ export class LoginRequest {
   @IsNotEmpty({
     message: 'email is required',
   })
+  @ApiProperty({
+    required: true,
+    example: 'test@test.com',
+    type: String,
+    description: 'Só é aceito email valido',
+  })
   email: string;
 
   @IsString({
@@ -14,6 +21,12 @@ export class LoginRequest {
   })
   @IsNotEmpty({
     message: 'password is required',
+  })
+  @ApiProperty({
+    required: true,
+    type: String,
+    description: 'senha utilizada no sistema',
+    example: '123456',
   })
   password: string;
 }
