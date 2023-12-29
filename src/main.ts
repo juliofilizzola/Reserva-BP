@@ -23,6 +23,7 @@ async function bootstrap() {
     .setTitle('Api Reserva')
     .setDescription('Api de reserva de usuario com coretores')
     .setVersion('1.0')
+    .addServer('http://localhost:3000')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'Authorization',
