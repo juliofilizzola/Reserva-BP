@@ -10,6 +10,7 @@ import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { validDocument } from '../../utils/validation/valid-document';
 import { formatDocument } from '../../utils/format/format-document';
+import { DeleteUser } from '../../swagger/delete-user';
 
 @Injectable()
 export class UserService {
@@ -67,12 +68,15 @@ export class UserService {
     return !!alreadyUser;
   }
 
-  async delete(id: string) {
-    return this.prismaService.user.delete({
+  async delete(id: string): Promise<DeleteUser> {
+    await this.prismaService.user.delete({
       where: {
         id,
       },
     });
+    return {
+      response: 'user deleted success',
+    };
   }
 
   async update(id: string, updatedUser: UpdateUserDto) {
@@ -96,7 +100,7 @@ export class UserService {
       });
     }
 
-    return this.prismaService.user.update({
+    await this.prismaService.user.update({
       where: {
         id,
       },
@@ -107,5 +111,8 @@ export class UserService {
         phone: updatedUser.phone || user.phone,
       },
     });
+    return {
+      response: 'user updated success',
+    };
   }
 }

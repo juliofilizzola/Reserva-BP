@@ -7,8 +7,14 @@ import {
   IsString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateReserveDto {
+  @ApiProperty({
+    description: 'Data of the reserve',
+    type: Date,
+    example: '2023-01-01T12:00:00Z',
+  })
   @IsNotEmpty({
     message: 'data is required',
   })
@@ -16,39 +22,41 @@ export class CreateReserveDto {
   @IsDate()
   date: Date;
 
-  @IsNumber(
-    {},
-    {
-      message: 'duration is invalid',
-    },
-  )
-  @IsPositive({
-    message: 'duration is invalid',
+  @ApiProperty({
+    description: 'Duration of the reserve in minutes',
+    type: Number,
+    example: 60,
   })
-  @IsNotEmpty({
-    message: 'duration is required',
-  })
+  @IsNumber({}, { message: 'duration is invalid' })
+  @IsPositive({ message: 'duration is invalid' })
+  @IsNotEmpty({ message: 'duration is required' })
   duration: number;
 
-  @IsString({
-    message: 'id broker invalid',
+  @ApiProperty({
+    description: 'ID of the broker',
+    type: String,
+    example: 'abc123',
   })
-  @IsNotEmpty({
-    message: 'id broker is required',
-  })
+  @IsString({ message: 'id broker invalid' })
+  @IsNotEmpty({ message: 'id broker is required' })
   idBroker: string;
 
-  @IsString({
-    message: 'description is invalid',
+  @ApiProperty({
+    description: 'Description of the reserve (optional)',
+    type: String,
+    example: 'Meeting with a client',
+    required: false,
   })
+  @IsString({ message: 'description is invalid' })
   @IsOptional()
   description?: string;
 
-  @IsString({
-    message: 'title is invalid',
+  @ApiProperty({
+    description: 'Title of the reserve',
+    type: String,
+    example: 'Client Meeting',
   })
-  @IsNotEmpty({
-    message: 'title is required',
-  })
+  @IsString({ message: 'title is invalid' })
+  @IsNotEmpty({ message: 'title is required' })
   title: string;
 }

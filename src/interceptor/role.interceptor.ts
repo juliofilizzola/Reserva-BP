@@ -21,7 +21,9 @@ export class RoleInterceptor implements NestInterceptor {
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
 
     if (!roles) {
-      throw new BadRequestException();
+      throw new BadRequestException({
+        message: 'Route without rule',
+      });
     }
 
     const authUser = await this.prismaService.user.findFirst({
