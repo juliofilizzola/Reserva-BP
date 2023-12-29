@@ -145,12 +145,16 @@ export class ReserveService {
       };
     }
 
-    return this.prismaService.reserve.update({
+    await this.prismaService.reserve.update({
       where: {
         id,
       },
       data: reserveUpdateInput,
     });
+
+    return {
+      response: 'reserve updated success',
+    };
   }
 
   async remove(id: string) {

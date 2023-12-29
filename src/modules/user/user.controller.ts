@@ -31,6 +31,7 @@ import { User } from './entities/user.entity';
 import { RouteWithoutRole } from '../../swagger/route-without-role';
 import { UpdateUser } from '../../swagger/update-user';
 import { DeleteUser } from '../../swagger/delete-user';
+import { ResponsePaginationUser } from '../../swagger/response-pagination-user';
 
 @Controller('user')
 @ApiTags('User')
@@ -68,10 +69,15 @@ export class UserController {
     description: 'Rota de puxar os dados de todos os usuario',
     summary: 'All',
   })
-  @ApiResponse({
+  @ApiOkResponse({
     status: 202,
     description: 'Usuarios encontratos com sucesso',
     type: [User],
+  })
+  @ApiResponse({
+    status: 202,
+    type: ResponsePaginationUser,
+    description: 'Retorno de user paginada',
   })
   @ApiUnauthorizedResponse({
     description: 'Quando o user não tem permisão para acessar a essa rota',
@@ -97,7 +103,7 @@ export class UserController {
   })
   @ApiOperation({
     description: 'Rota de puxar os dados de um usuario',
-    summary: ':Id',
+    summary: 'Find One',
   })
   @ApiResponse({
     status: 401,
@@ -139,6 +145,7 @@ export class UserController {
   updateAdmin(@Param() id: string, @Body() updateUser: UpdateUserDto) {
     return this.userService.update(id, updateUser);
   }
+
   @Patch()
   @ApiOperation({
     summary: 'Update',
