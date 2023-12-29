@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { TypeRole } from '@prisma/client';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { fakeUser, fakeUser2, prismaMock } from '../../mocks/AuthAndUser.mock';
+import { fakeUser, fakeUser2, prismaMock } from '../../mocks/mock';
 import * as bcrypt from 'bcrypt';
 
 describe('AuthService', () => {

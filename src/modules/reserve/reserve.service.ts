@@ -177,7 +177,7 @@ export class ReserveService {
     });
   }
 
-  private async validateReservation(
+  async validateReservation(
     data: IValidationReserve,
   ): Promise<IResponseValidationReserve> {
     const currentDate = new Date();

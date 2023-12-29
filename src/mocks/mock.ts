@@ -1,4 +1,4 @@
-import { Auth, User } from '@prisma/client';
+import { Auth, Reserve, User } from '@prisma/client';
 
 const fakeUser = [
   {
@@ -65,14 +65,34 @@ const AuthUser: User & { auth: Auth } = {
   updatedAt: new Date(),
   deletedAt: null,
 };
+
+const reserves: Reserve[] = [
+  {
+    id: '14087e68-e669-482b-b908-bc33623a036d',
+    title: 'reunião inicial',
+    date: new Date('2024-01-01T19:55:36.437Z'),
+    duration: 30,
+    description: '',
+    brokerId: '14087e68-e669-482b-b908-bc33623a036d',
+    clientId: '14087e68-e669-482b-b908-bc33623a036d',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: null,
+  },
+];
 const prismaMock = {
   user: {
     create: jest.fn().mockReturnValue(fakeUser2[1]),
     findMany: jest.fn().mockResolvedValue(fakeUser2),
     findFirst: jest.fn().mockResolvedValue(AuthUser),
     update: jest.fn().mockResolvedValue(fakeUser2[0]),
-    delete: jest.fn(), // O método delete não retorna nada
+  },
+  reserve: {
+    create: jest.fn().mockReturnValue(fakeUser2[1]),
+    findMany: jest.fn().mockResolvedValue(reserves),
+    findFirst: jest.fn().mockResolvedValue(AuthUser),
+    update: jest.fn().mockResolvedValue(fakeUser2[0]),
   },
 };
 
-export { fakeUser, fakeUser2, AuthUser, prismaMock };
+export { fakeUser, fakeUser2, AuthUser, prismaMock, reserves };
