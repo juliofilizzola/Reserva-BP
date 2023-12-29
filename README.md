@@ -1,6 +1,6 @@
 # CRUD de Cadastro de Usuários - Reserva BP
 
-Neste desafio, foi criado CRUD de cadastro de usuários, onde os usuários podem ser Corretores de Seguro ou Clientes.
+Neste desafio, foi criado um CRUD de cadastro de usuários, onde os usuários podem ser Corretores de Seguro ou Clientes.
 A aplicação utiliza Nodejs e banco de dados PostegreSql.
 
 ### 1 - Tecnologias e Bibliotecas Utilizadas
