@@ -80,6 +80,19 @@ const reserves: Reserve[] = [
     deletedAt: null,
   },
 ];
+
+const reserveError: Reserve = {
+  id: '14087e68-e669-482b-b908-bc33623a036d',
+  title: 'reunião inicial',
+  date: new Date('2024-01-01T19:30:00.000Z'),
+  duration: 30,
+  description: '',
+  brokerId: '14087e68-e669-482b-b908-bc33623a036d',
+  clientId: '14087e68-e669-482b-b908-bc33623a036d',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  deletedAt: null,
+};
 const prismaMock = {
   user: {
     create: jest.fn().mockReturnValue(fakeUser2[1]),
@@ -95,4 +108,4 @@ const prismaMock = {
   },
 };
 
-export { fakeUser, fakeUser2, AuthUser, prismaMock, reserves };
+export { fakeUser, fakeUser2, AuthUser, prismaMock, reserves, reserveError };
